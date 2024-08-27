@@ -2,4 +2,4 @@ type Category = {
   category_name: string;
 };
 
-export { Category };
+export {Category};

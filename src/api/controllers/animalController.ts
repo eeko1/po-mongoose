@@ -17,7 +17,7 @@ const postAnimal = async (
     const newAnimal = new AnimalModel(req.body);
     const savedAnimal = await newAnimal.save();
 
-    res.json({
+    res.status(201).json({
       message: 'Animal created',
       data: savedAnimal,
     });
@@ -104,4 +104,33 @@ const deleteAnimal = async (
   }
 };
 
-export {postAnimal, getAnimal, getSingleAnimal, putAnimal, deleteAnimal};
+const getAnimalsByBox = async (
+  req: Request<{}, {}, {}, {topRight: string; bottomLeft: string}>,
+  res: Response<Animal[]>,
+  next: NextFunction,
+) => {
+  try {
+    const {topRight, bottomLeft} = req.query;
+
+    const animals = await AnimalModel.find({
+      location: {
+        $geoWithin: {
+          $box: [topRight.split(','), bottomLeft.split(',')],
+        },
+      },
+    });
+
+    res.json(animals);
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
+export {
+  postAnimal,
+  getAnimal,
+  getSingleAnimal,
+  putAnimal,
+  deleteAnimal,
+  getAnimalsByBox,
+};
