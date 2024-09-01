@@ -32,7 +32,15 @@ const getAnimal = async (
   next: NextFunction,
 ) => {
   try {
-    const species = await AnimalModel.find();
+    const species = await AnimalModel.find()
+    .select('-__v')
+    .populate({
+      path: 'species',
+      select: '-__v',
+      populate: {
+        path: 'category',
+        select: '-__v',
+    }});
 
     res.json(species);
   } catch (error) {
@@ -126,6 +134,20 @@ const getAnimalsByBox = async (
   }
 };
 
+const getBySpecies = async (
+  req: Request<{species: string}>,
+  res: Response<Animal[]>,
+  next: NextFunction,
+) => {
+  try {
+    const animals = await AnimalModel.findBySpecies(req.params.species);
+
+    res.json(animals);
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+}
+
 export {
   postAnimal,
   getAnimal,
@@ -133,4 +155,5 @@ export {
   putAnimal,
   deleteAnimal,
   getAnimalsByBox,
+  getBySpecies,
 };
