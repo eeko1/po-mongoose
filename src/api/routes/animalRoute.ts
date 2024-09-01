@@ -1,8 +1,8 @@
 import express from 'express';
 import {
   deleteAnimal,
-  getSingleAnimal,
   getAnimal,
+  getAnimals,
   postAnimal,
   putAnimal,
   getAnimalsByBox,
@@ -11,12 +11,9 @@ import {
 
 const router = express.Router();
 
-router.route('/').post(postAnimal).get(getAnimal);
-
+router.route('/').post(postAnimal).get(getAnimals);
 router.route('/location').get(getAnimalsByBox);
-
 router.route('/species/:species').get(getBySpecies);
-
-router.route('/:id').get(getSingleAnimal).put(putAnimal).delete(deleteAnimal);
+router.route('/:id').get(getAnimal).put(putAnimal).delete(deleteAnimal);
 
 export default router;

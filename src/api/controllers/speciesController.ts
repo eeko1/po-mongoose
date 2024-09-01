@@ -3,6 +3,7 @@ import SpeciesModel from '../models/speciesModel';
 import {Species} from '../../types/Species';
 import {MessageResponse} from '../../types/Messages';
 import CustomError from '../../classes/CustomError';
+import { Polygon } from 'geojson';
 
 type DBMessageResponse = MessageResponse & {
   data: Species | Species[];
@@ -104,4 +105,19 @@ const deleteSpecies = async (
   }
 };
 
-export {postSpecies, getSpecies, getSingleSpecies, putSpecies, deleteSpecies};
+// Add a static method to 'Species' model to find all species within a certain area specified by a geoJson polygon: findByArea(polygon: Polygon): Promise<Species[]>
+// The endpoint should be POST /species/area and the body should contain the geoJson polygon in the following forma
+const getSpeciesByLocation = async (req: Request<{}, {}, {polygon: Polygon}>, res: Response<Species[]>, next: NextFunction) => {
+  try {
+    const { polygon } = req.body;
+    const species = await SpeciesModel.findByArea(polygon);
+
+    res.json(species);
+  } catch (error) {
+    next(new CustomError((error as Error).message, 500));
+  }
+};
+
+
+
+export {postSpecies, getSpecies, getSingleSpecies, putSpecies, deleteSpecies, getSpeciesByLocation};

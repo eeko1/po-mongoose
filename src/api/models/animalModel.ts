@@ -38,13 +38,29 @@ animalSchema.statics.findBySpecies = function (
         as: 'species',
       },
     },
+    {$unwind: '$species'},
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'species.category',
+        foreignField: '_id',
+        as: 'species.category',
+      },
+    },
+    {$unwind: '$species.category'},
     {
       $match: {
         'species.species_name': species_name,
       },
     },
-  ])
-  .exec();
-}
+    {
+      $project: {
+        v: 0,
+        'species.v': 0,
+        'species.category.__v': 0,
+      },
+    },
+  ]);
+};
 
 export default model<Animal, AnimalModel>('Animal', animalSchema);
